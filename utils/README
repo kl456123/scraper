@@ -1,0 +1,14 @@
+　　　　　　　　　　　　　　　　　　　　中文
+　　这个文件夹完成这个框架积累下来的常用工具函数，以后可以做成lib库。目前这里有些
+网络文件IO的相关操作的函数，大多是经过Promise包装的异步函数，方便使用。
+
+　　　　　                       English
+    There are some utilities in this directory.I can make a libs in the
+future. At present here are some functions about operations for net and
+files. The function are wrapped by Promise at most.You can use it for
+convenience.
+
+
+
+
+Copyright (c) 2015 Copyright Holder All Rights Reserved.

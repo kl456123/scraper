@@ -1,0 +1,30 @@
+{
+  "name": "scraper",
+  "version": "1.0.0",
+  "description": "scrap sth by nodeJs",
+  "main": "demo.js",
+  "scripts": {
+    "test": "node demo.js"
+  },
+  "author": "breakpoint",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^0.19.0",
+    "co": "^4.6.0",
+    "gm": "^1.21.1",
+    "iconv": "^2.1.11",
+    "iconv-lite": "^0.4.13",
+    "jquery": "^2.1.4",
+    "request": "^2.67.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-mocha-test": "^0.12.7",
+    "jshint": "^2.9.1",
+    "mocha": "^2.4.5",
+    "should": "^8.2.2",
+    "watch": "^0.17.1"
+  }
+}

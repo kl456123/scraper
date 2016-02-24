@@ -1,0 +1,31 @@
+                              English
+Here are some files for experiments .Because I can not use some
+functions well =-=.
+At present ,I tested some functions and practiced some syntax.
+
+1. Promise.
+2.asynchronous.
+3.thread.
+4.encode and decode.
+5.AJAX
+
+
+.......
+I will add some syntax or some tips then　if they are needed.
+
+                      　　　　　中文
+这个文件夹是用来做测试实验用的，因为有些语法函数功能我暂时没有把握用对，用好，为保证
+项目文件夹的干净整洁，就临时放在这个目录下。
+目前我测试练习了一些要点如下：
+
+１．Promise 函数。
+２．异步调用。
+３．多线程架构。
+４．编码与解码(主要针对中文GBK编码集)
+5．AJAX(异步通信)
+
+
+．．．．．
+
+
+以后我还会再陆续添加一些要点，如果项目需要的话。。。
