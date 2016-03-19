@@ -3,11 +3,11 @@ var cheerio = require('cheerio');
 var path = require('path');
 var fs = require('fs');
 var gm = require('gm');
-var handleUrl = require('./util.js').handleUrl;
-var proRequest = require('./util.js').proRequest;
-var handleImg = require('./util.js').handleImg;
+var handleUrl = require('../../utils/utils.js').handleUrl;
+var proRequest = require('../../utils/utils.js').proRequest;
+var handleImg = require('../../utils/utils.js').handleImg;
 var co = require('co');
-var downloadFile = require('./util.js').downloadFile;
+var downloadFile = require('../../utils/ioUtils.js').downloadFile;
 var dir = './img/';
 
 
@@ -17,7 +17,7 @@ function getImg(requrl) {
 
         request(requrl, function(error, response, body) {
 
-            if (!error && response.statusCode == 200) {
+            if (!error && response.statusCode === 200) {
 
                 // console.log(body); //返回请求页面的HTML
                 acquireData(body, requrl);
@@ -44,8 +44,9 @@ function acquireData(data, requrl) {
 
     meizi.forEach(function(meiziOne) {
 
-        if (meiziOne == undefined)
+        if (meiziOne === undefined) {
             return;
+        }
 
         var imgsrc = meiziOne.attribs.src;
 
@@ -55,7 +56,9 @@ function acquireData(data, requrl) {
 
         imgsrc = handleUrl(imgsrc, requrl);
 
-        if (imgsrc == undefined) return;
+        if (imgsrc === undefined) {
+            return;
+        }
 
         var path = dir + filename;
 

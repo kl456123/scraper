@@ -2,7 +2,7 @@
  * test getJokes function
  */
 var should = require('should');
-var getJokes = require('../getJokes.js');
+var getJokes = require('../workSpace/Jokes/getJokes.js');
 
 
 // mock urlSrc

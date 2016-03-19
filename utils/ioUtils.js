@@ -1,5 +1,5 @@
-let MongoClient = require('mongodb').MongoClient;
-
+var MongoClient = require('mongodb').MongoClient;
+var fs = require('fs');
 
 // load simple config
 // then move all to a file
@@ -165,6 +165,12 @@ function renameFile(oldPath, newPath) {
 }
 
 
+// function downloadFile(url,path,callback){
+// 	return new Promise(function(resolve,reject){
+// 		request()
+// 	});
+// }
+
 
 var exportObj = {};
 
@@ -178,5 +184,6 @@ exportObj.deleteDocument = deleteDocument;
 exportObj.writeFile = writeFile;
 exportObj.renameFile = renameFile;
 exportObj.deleteFile = deleteFile;
+// exportObj.downloadFile=downloadFile;
 
 module.exports = exportObj;

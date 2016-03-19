@@ -2,15 +2,15 @@ var request = require('request');
 var cheerio = require('cheerio');
 var path = require('path');
 var fs = require('fs');
-var handleUrl = require('./util.js').handleUrl;
+var handleUrl = require('../../utils/utils.js').handleUrl;
 var co = require('co');
-var proRequest = require('./util.js').proRequest;
+var proRequest = require('../../utils/utils.js').proRequest;
 
 
 var getURL = function(urlSrc) {
 	return new Promise(function(resolve, reject) {
 		request(urlSrc, function(error, response, data) {
-			if (!error && response.statusCode == 200) {
+			if (!error && response.statusCode === 200) {
 				var urls = parse(data, urlSrc).slice(0);
 				resolve(urls);
 			} else {
@@ -45,7 +45,7 @@ function parse(data, url) {
 	a.forEach(function(aOne) {
 		var href = aOne.attribs.href;
 		href = handleUrl(href, url);
-		if (href == undefined) {
+		if (href === undefined) {
 			return;
 		}
 		urls.push(href);
@@ -63,27 +63,28 @@ module.exports = exoprtObj;
 
 
 
-// 
-// 
+//
+//
 var allURL = [];
 // test queen
-// 
+//
 
 
 // // var result = [];
 
 function _asyGetURL(src, callback) {
 	console.log(allURL.length);
-	if (allURL.length == 0) {
-		console.log("url is empty");
+	if (allURL.length === 0) {
+		console.log('url is empty');
 		return;
 	}
 	callback(src);
 	allURL.shift();
 	var data = src.toString() + '\n';
 	fs.appendFile('url.json', data, 'utf8', function(error) {
-		if (error)
+		if (error) {
 			throw error;
+		}
 	});
 	getURL(src)
 		.then(function(nextURL) {
@@ -98,14 +99,14 @@ function _asyGetURL(src, callback) {
 }
 
 
-// 
+//
 function asyGetURL(src, callback) {
 
 	allURL.push(src);
 	_asyGetURL(src, callback);
 }
-// 
-// 
+//
+//
 // Promise
 // getURL(src)
 // 	.then(function(urls) {

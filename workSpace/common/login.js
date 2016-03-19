@@ -8,193 +8,155 @@ var fs = require('fs');
 var zlib = require('zlib');
 
 
-var writeFile = require('./util.js').writeFile;
-var downloadFile = require('./util.js').downloadFile;
-var configAll = require('./util.js').configAll;
+var writeFile = require('../../utils/ioUtils.js').writeFile;
+var download = require('../../utils/utils.js').download;
+var configAll = require('../../utils/utils.js').configAll;
 
 
 
 // load options
-var options = require('./headers/options.js');
+var options = require('../../data/headers/options.js');
 var options_get = options.options_get;
 var options_post = options.options_post;
 
 
 
-// var url = 'https://www.zhihu.com/';
-var url = 'https://www.zhihu.com/topic/19570168';
+var url = 'https://www.zhihu.com';
 var captcha_url = 'https://www.zhihu.com/captcha.gif';
-
+var conf = {};
 options_get.url = url;
 
 // search Cookies
 // tell if Cookie is existing
-var files = fs.readdirSync('./Cookie');
+var files = fs.readdirSync('../../data/cookie');
 var _Cookies = [];
 
 files.forEach(function(one) {
 
 	try {
-		_CookiesOne = fs.readFileSync('./Cookie/' + one);
+		_CookiesOne = fs.readFileSync('../../data/cookie/' + one);
 		_Cookies.push(_CookiesOne);
 
 	} catch (err) {
 
-		console.log(err);
+		console.log(err.stack);
 	}
 });
 
-if (_Cookies.length !== 0) {
+console.log(_Cookies.length);
+login(_Cookies)
 
-	options_get.headers['Cookie'] = _Cookies;
+.then(function(cookies) {
+		console.log('have cookies!');
+		return cookies;
 
-	request(options_get, function(err, res, body) {
+	}, function() {
+		return getPromise();
+	})
+	.then(function(body) {
+		if (_Cookies.length !== 0) {
+			return;
+		}
 
-		writeFile('zhihu.html', body)
-			.then(function() {
-				console.log('login!');
-			})
-			.catch(function(err) {
-				console.log(err);
-			});
-	});
-} else {
-
-	// it is unnecessary to check _xsrf
-	// var _xsrf_;
-	// try {
-	// 	_xsrf_ = fs.readdirSync('./_xsrf');
-	// } catch (err) {
-	// 	console.log(err);
-	// }
-	// if (_xsrf_ !== undefined) {
-
-	// } else {
-
-	request.get(url, function(err, res, body) {
 		// find _xsrf
-
 		var $ = cheerio.load(body);
-
+		// console.log($);
 		var _xsrf = $("*[name='_xsrf']").val();
-
-		var conf = configAll();
+		console.log(_xsrf);
+		conf = configAll();
 
 		conf['_xsrf'] = _xsrf;
 
 		// save _xsrf
-		writeFile('./PostReq/_xsrf', _xsrf.toString())
+		writeFile('../../data/postReq/_xsrf', _xsrf)
 
 		.then(function() {
 
-				console.log('save cookie!');
+				console.log('save _xsrf!');
 			})
 			.catch(function(err) {
 
-				console.log(err);
+				console.log(err.stack);
 			});
 
 
 		// get captcha
-		downloadFile(captcha_url, 'captcha.gif', function(err, res) {
-
-			if (err) {
-
-				console.log(err);
-
-				return;
-			}
-
-
-		});
-
-		const rl = readline.createInterface({
-
-			input: process.stdin,
-
-			output: process.stdout
-
-		});
-
-		rl.question('Please scanf your captcha? ', (answer) => {
-
-			var captcha = answer;
-			conf['captcha'] = captcha;
-
-			// stringify conf
-			var content = qs.stringify(conf);
-			// console.log(conf);
-			// set options 
-
-			// var temp = fs.readFileSync('cookie', 'utf-8');
-			// // console.log(temp);
-			// if (temp !== undefined) {
-			// 	options.headers['Cookie'] = temp;
-			// }
-			// console.log(options.headers['Cookie']);
-			// 
-
-
-
-			options_post.headers['Content-Length'] = content.length;
-
-			options_post.body = content;
-
-			var Cookie;
-
-			// post data 
-			request(options_post, function(err, res, body) {
-
-				var data = JSON.parse(body);
-
-				msg = data['msg'] || data['data'];
-
-				console.log(data);
-
-
-				Cookie = res.headers['set-cookie'];
-
-				list(Cookie);
-				// save cookie
-				// if (temp == undefined) {
-
-				Cookie.forEach(function(item, index) {
-
-					writeFile('./Cookie/' + index, item)
-
-					.then(function() {
-							console.log(index + ':save cookie!');
-						})
-						.catch(function(err) {
-							console.log(err);
-						});
-				});
-
-				// }
-
-				options_get.headers['Cookie'] = Cookie;
-
-				// options_get.body = qs.stringify(temp);
-				request(options_get, function(err, res, body) {
-
-					writeFile('zhihu.html', body)
-
-					.then(function() {
-							console.log('login!');
-						})
-						.catch(function(err) {
-							console.log(err);
-						});
-				});
+		download(captcha_url, '../../data/captcha/captcha.gif')
+			.catch(function(error) {
+				console.log(error.stack);
 			});
 
-			rl.close();
+		return ansPromise();
+
+	})
+	.then(function(answer) {
+		if (_Cookies.length !== 0) {
+			return;
+		}
+		var captcha = answer;
+		conf['captcha'] = captcha;
+
+		// stringify conf
+		var content = qs.stringify(conf);
+
+		options_post.headers['Content-Length'] = content.length;
+
+		options_post.body = content;
+		return postPromise(options_post);
+
+	})
+	.then(function(res) {
+
+		if (_Cookies.length !== 0) {
+			return _Cookies;
+		}
+		// post data
+
+		var body = res.body;
+		var Cookie;
+		var data = JSON.parse(body);
+
+		msg = data['msg'] || data['data'];
+
+		console.log(data);
+
+
+		Cookie = res.headers['set-cookie'];
+
+		list(Cookie);
+
+		Cookie.forEach(function(item, index) {
+
+			writeFile('../../data/cookie/' + index, item)
+
+			.then(function() {
+					console.log(index + ':save cookie!');
+				})
+				.catch(function(err) {
+					console.log(err.stack);
+				});
 		});
+		return Cookie;
 
+	})
+	.then(function(cookies) {
+
+		options_get.headers['Cookie'] = cookies;
+
+		request.get(options_get, function(err, res, body) {
+
+			writeFile('../../data/html/zhihu.html', body)
+				.then(function() {
+					console.log('login!');
+				})
+				.catch(function(err) {
+					console.log(err.stack);
+				});
+		});
+	})
+	.catch(function(err) {
+		console.log(err.stack);
 	});
-	// }
-
-}
 
 
 
@@ -231,29 +193,159 @@ function list(Cookie) {
 }
 
 
-//  Let me think about it later....
-// get_xsrf()
-// 	.then(function(_xsrf) {
-// 		return _xsrf;
-// 	}, function() {
-// 		request.get(url, function(err, res, body) {
+
+//get cookies by Promise
+function login(cookies) {
+	return new Promise(function(resolve, reject) {
+		if (cookies.length == 0) {
+			reject();
+		} else {
+			resolve(cookies);
+		}
+	});
+};
+
+
+function getPromise() {
+	return new Promise(function(resolve, reject) {
+		request.get(url, function(err, res, body) {
+			if (err) {
+				reject(err);
+				return;
+			}
+			resolve(body);
+		});
+	});
+}
+
+function postPromise(options) {
+	return new Promise(function(resolve, reject) {
+		request(options, function(err, res, body) {
+			if (err) {
+				reject(err);
+				return;
+			}
+			resolve(res);
+		});
+	});
+}
+
+
+function ansPromise() {
+	const rl = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout
+	});
+
+	return new Promise(function(resolve, reject) {
+		rl.question('Please scanf your captcha? ', (answer) => {
+			resolve(answer);
+			rl.close();
+		});
+
+	});
+}
+
+// function getCookies() {
+// 	getPromise()
+// 		.then(function(body) {
+// 			// find _xsrf
+
 // 			var $ = cheerio.load(body);
+
 // 			var _xsrf = $("*[name='_xsrf']").val();
 
 // 			var conf = configAll();
-// 			conf['_xsrf'] = _xsrf;
 
+// 			conf['_xsrf'] = _xsrf;
+// 			console.log(_xsrf);
 // 			// save _xsrf
-// 			writeFile('_xsrf', _xsrf.toString())
-// 				.then(function() {
-// 					console.log('save cookie!');
+// 			writeFile('../../data/postReq/_xsrf', _xsrf.toString())
+
+// 			.then(function() {
+
+// 					console.log('save _xsrf!');
 // 				})
 // 				.catch(function(err) {
-// 					console.log(err);
-// 				});
-// 				return 
-// 		});
-// 	})
-// 	.then(function() {
 
-// 	})
+// 					console.log(err.stack);
+// 				});
+
+
+// 			// get captcha
+// 			download(captcha_url, '../../data/captcha/captcha.gif')
+// 				.catch(function(error) {
+// 					console.log(error.stack);
+// 				});
+
+// 			const rl = readline.createInterface({
+
+// 				input: process.stdin,
+
+// 				output: process.stdout
+
+// 			});
+
+// 			rl.question('Please scanf your captcha? ', (answer) => {
+
+// 				var captcha = answer;
+// 				conf['captcha'] = captcha;
+
+// 				// stringify conf
+// 				var content = qs.stringify(conf);
+
+// 				options_post.headers['Content-Length'] = content.length;
+
+// 				options_post.body = content;
+
+// 				var Cookie;
+
+// 				// post data
+// 				request(options_post, function(err, res, body) {
+
+// 					var data = JSON.parse(body);
+
+// 					msg = data['msg'] || data['data'];
+
+// 					console.log(data);
+
+
+// 					Cookie = res.headers['set-cookie'];
+
+// 					list(Cookie);
+
+// 					Cookie.forEach(function(item, index) {
+
+// 						writeFile('../../data/cookie/' + index, item)
+
+// 						.then(function() {
+// 								console.log(index + ':save cookie!');
+// 							})
+// 							.catch(function(err) {
+// 								console.log(err.stack);
+// 							});
+// 					});
+// 					return Cookie;
+
+// 				});
+
+// 				rl.close();
+// 			});
+// 		})
+// 		.catch(function(err) {
+// 			console.log(err);
+// 		});
+
+
+// }
+
+
+// coding by genernator and promise
+//
+// function login * () {
+// 	if (_Cookies.length == 0) {
+// 		var cookies = yield getCookies();
+// 	} else {
+
+// 	}
+// }

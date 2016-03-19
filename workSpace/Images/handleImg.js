@@ -11,8 +11,8 @@ var fs = require('fs');
 // 		console.log('height:' + size.height);
 // 		// fs.unlink('./images/0-3iPJWn.jpg');
 // 	});
-// 	
-var dir = './test/'
+//
+var dir = '../data/images/';
 var files = fs.readdirSync(dir);
 // console.log(files[0]);
 // files.forEach(function(file) {
@@ -53,7 +53,7 @@ function test(path) {
 }
 // var temp = './test/' + '1_1022211021Y39.jpg';
 // test(temp);
-// 
+//
 files.forEach(function(file) {
 	test(dir + file);
 });

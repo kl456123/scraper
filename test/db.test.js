@@ -1,7 +1,7 @@
 /**
  * test db_utils.js for using mongodb
  */
-var exportObj = require('../db_utils/utils.js');
+var exportObj = require('../utils/ioUtils.js');
 
 
 var insertDocument = exportObj.insertDocument;

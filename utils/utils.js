@@ -78,45 +78,6 @@ function deleteFile(path) {
 
 
 /**
- * save data to file
- * @param  {string} path   path to file even if it is not found!
- * @param  {string} data  data you want to save
- * @return {promise class}
- */
-function writeFile(path, data) {
-	return new Promise(function(resolve, reject) {
-		fs.writeFile(path, data, 'utf8', function(err) {
-			if (err) {
-				reject(err);
-			} else {
-				resolve(data);
-			}
-		});
-	});
-}
-
-
-/**
- * rename file
- * @param  {string} oldPath old path
- * @param  {string} newPath ....
- * @return {promise class}         ....
- * @requires fs module
- */
-function renameFile(oldPath, newPath) {
-	return new Promise(function(resolve, reject) {
-		fs.rename(oldPath, newPath, function(err) {
-			if (err) {
-				reject(err);
-			} else {
-				resolve('success rename file!');
-			}
-		});
-	});
-}
-
-
-/**
  * process Request by promise to use it well
  * @param {string} requrl    url to request
  * @returns {Promise class} a promise to handle request result
@@ -169,36 +130,6 @@ function handleImg(path) {
 		});
 }
 
-/**
- * download flie from web
- * @param  {string}   uri      [description]
- * @param  {string}   path    path to where you want to save file
- * @param  {Function} callback callback to handle error and get res object...
- * @example
- * downloadFile('http://www.baidu.com/',/path/to/file/,function(err,res){
- * 	//do something you want here!
- * });
- */
-function downloadFile(url, path, callback) {
-	request.head(url, function(err, res, body) {
-		// console.log('content-type:', res.headers['content-type']);  //这里返回图片的类型
-		// console.log('content-length:', res.header); //图片大小
-		if (err) {
-			callback(err, null);
-			return;
-		}
-
-		request(url)
-			.on('error', function(err) {
-
-				callback(err, res);
-			})
-			.pipe(fs.createWriteStream(path)).on('close', function() {
-
-				callback(null, res);
-			});
-	});
-}
 
 
 var config = {};
@@ -215,9 +146,27 @@ function _configAll(conf, defaultConf) {
 }
 
 function configAll() {
-	var defaultConf = require('./Conf/defaultConf.js');
-	var conf = require('./config.js');
+	var defaultConf = require('../conf/defaultConf.js');
+	var conf = require('../config.js');
 	return _configAll(conf, defaultConf);
+}
+
+
+
+function download(url, path) {
+	return new Promise(function(resolve, reject) {
+		request(url)
+			.pipe(fs.createWriteStream(path))
+			.on('error', function(err) {
+				reject(err);
+
+			})
+			.on('close', function() {
+				resolve();
+			});
+
+
+	});
 }
 
 
@@ -229,10 +178,8 @@ exportObj.proRequest = proRequest;
 
 exportObj.handleImg = handleImg;
 
-exportObj.downloadFile = downloadFile;
-
-exportObj.writeFile = writeFile;
-
 exportObj.configAll = configAll;
+
+exportObj.download = download;
 
 module.exports = exportObj;

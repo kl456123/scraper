@@ -1,10 +1,12 @@
 var request = require('request');
 var cheerio = require('cheerio');
-var handleUrl = require('./util.js').handleUrl;
-var writeFile = require('./util.js').writeFile;
+var handleUrl = require('../../utils/utils.js').handleUrl;
 
-var dbUtils = require('./db_utils/utils.js');
-var insertDocument = dbUtils.insertDocument;
+
+var ioUtils = require('../../utils/ioUtils.js');
+
+var writeFile = ioUtils.writeFile;
+var insertDocument = ioUtils.insertDocument;
 
 
 
@@ -12,7 +14,7 @@ var insertDocument = dbUtils.insertDocument;
 var iconv = require('iconv-lite');
 // try to scrapy the page from http://xiaohua.zol.com.cn/detail31/30142.html
 // var urlSrc = 'http://xiaohua.zol.com.cn/detail31/30142.html';
-var path = './GetData/mock.json';
+var path = '../../data/mock.json';
 
 var getJokes = function(urlSrc) {
 	var option = {
