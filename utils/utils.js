@@ -29,7 +29,7 @@ function handleUrl(URL, preURL) {
 
 	// ignore error url
 	/*jshint scripturl:true*/
-	if (URL === undefined || URL === 'javascript:;' || URL === '/') {
+	if (URL === undefined || URL === 'javascript:;' || URL === '/' || URL === '#') {
 		// throw new Error("url is undefined!");
 		return;
 	}
@@ -38,6 +38,11 @@ function handleUrl(URL, preURL) {
 	if (URL.slice(0, 2) === '//') {
 		var head = 'http:';
 		URL = head.concat(URL);
+	}
+
+	if (URL[0] !== '/') {
+		var temp = '/';
+		URL = temp.concat(URL);
 	}
 
 	// add static path
@@ -170,6 +175,13 @@ function download(url, path) {
 }
 
 
+
+// async function for test async feature
+function async(func, callback) {
+	func();
+	setTimeout(callback, 0);
+}
+
 var exportObj = {};
 
 exportObj.handleUrl = handleUrl;
@@ -181,5 +193,7 @@ exportObj.handleImg = handleImg;
 exportObj.configAll = configAll;
 
 exportObj.download = download;
+
+exportObj.async = async;
 
 module.exports = exportObj;

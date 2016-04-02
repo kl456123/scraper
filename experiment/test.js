@@ -1,5 +1,5 @@
-var exportObj = require('./getURL.js');
-var getImg = require('./getImg.js');
+// var exportObj = require('./getURL.js');
+// var getImg = require('./getImg.js');
 var fs = require('fs');
 // var asyGetURL = exportObj.asyGetURL;
 
@@ -10,7 +10,23 @@ var fs = require('fs');
 // 			console.log(err);
 // 		});
 // });
-// 
-var temp = fs.readFileSync('cookie', 'utf-8');
+//
+// var temp = fs.readFileSync('cookie', 'utf-8');
 
-console.log(temp);
+// console.log(temp);
+//  pass value on
+var str = 'hello world';
+var str2 = str;
+str2 = 'a';
+console.log(str);
+console.log(str2);
+
+
+function setName(obj) {
+  obj.name = 'breakpoint';
+  obj = {};
+  obj.name = 'asfas';
+}
+var person = {};
+setName(person);
+console.log(person.name);
