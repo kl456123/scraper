@@ -11,3 +11,12 @@ Features
 1. proxy
 2. Multi-thread and Multi-process
 3. message queue
+
+0.2.0
+Features
+(add)
+1.Multi-process
+2.message queue
+
+(unfinished)
+1.load
