@@ -171,6 +171,21 @@ function renameFile(oldPath, newPath) {
 // 	});
 // }
 
+function readArray(file) {
+	return new Promise(function(resolve, reject) {
+		fs.readFile(file, 'utf8', function(err, data) {
+			if (err) {
+				// console.log(err);
+				reject(err);
+				return;
+			}
+			resolve(data.split(','));
+			// console.log(data);
+		});
+	});
+
+}
+
 
 var exportObj = {};
 
@@ -184,6 +199,7 @@ exportObj.deleteDocument = deleteDocument;
 exportObj.writeFile = writeFile;
 exportObj.renameFile = renameFile;
 exportObj.deleteFile = deleteFile;
+exportObj.readArray = readArray;
 // exportObj.downloadFile=downloadFile;
 
 module.exports = exportObj;
