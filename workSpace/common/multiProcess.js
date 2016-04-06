@@ -6,8 +6,14 @@ var queue = new Queue();
 var getURL = require('../Images/getURL.js').getURL;
 var handleUrl = require('../../utils/utils.js').handleUrl;
 var BloomFilter = require('bloomfilter').BloomFilter;
+var proRequest = require('../../utils/utils.js').proRequest;
 
 // init queue
+//
+// because I have eight cpu cores for matching eight urls
+//
+// I will deal the problem to improve it.
+// then I can delete the following urls.
 var urlsrc = 'http://xiaohua.zol.com.cn/';
 queue.push(urlsrc);
 urlsrc = 'http://joke.876.tw/';
@@ -26,7 +32,7 @@ urlsrc = 'http://joke.876.tw/show/1/51350.shtml';
 queue.push(urlsrc);
 
 
-function multiScripy(handler) {
+function multiScrapy(handler, urlSelector, selector) {
 
   if (cluster.isMaster) {
 
@@ -42,9 +48,9 @@ function multiScripy(handler) {
     for (var i = 0; i < numCPUs; i++) {
       var worker = cluster.fork();
 
-      var url = queue.pop();
+      var _url = queue.pop();
 
-      worker.send(url);
+      worker.send(_url);
       // });
     }
     // setTimeout(function() {
@@ -68,9 +74,9 @@ function multiScripy(handler) {
     Object.keys(cluster.workers).forEach(function(id) {
       cluster.workers[id].on('message', function(msg) {
         if (msg === 'error') {
-          var url = queue.pop();
-          bloom.add(url);
-          cluster.workers[id].send(url);
+          var _url = queue.pop();
+          bloom.add(_url);
+          cluster.workers[id].send(_url);
 
           return;
         }
@@ -93,10 +99,17 @@ function multiScripy(handler) {
         return;
       }
       if (handler !== undefined) {
-        handler(url);
+        proRequest(url)
+          .then(function([page, requrl]) {
+            handler(page, selector, requrl);
+          })
+          .catch(function(err) {
+            console.log(err);
+          });
+        // handler(selector);
       }
 
-      getURL(url)
+      getURL(url, urlSelector)
         .then(function(urls) {
           // console.log(urls);
           if (urls.length !== 0) {
@@ -116,5 +129,5 @@ function multiScripy(handler) {
 }
 
 
-module.exports = multiScripy;
-multiScripy();
+module.exports = multiScrapy;
+// multiScripy();
