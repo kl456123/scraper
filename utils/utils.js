@@ -2,6 +2,7 @@ var fs = require('fs');
 var gm = require('gm');
 var request = require('request');
 var url = require('url');
+var path = require('path');
 // var qs = require('querystring');
 //
 //
@@ -188,6 +189,12 @@ function parseUrlForFileName(address) {
 	return filename;
 }
 
+function list(obj) {
+	for (var key in obj) {
+		console.log(key + ':' + (typeof obj[key]));
+	}
+}
+
 var exportObj = {};
 
 exportObj.handleUrl = handleUrl;
@@ -203,5 +210,7 @@ exportObj.download = download;
 exportObj.async = async;
 
 exportObj.parseUrlForFileName = parseUrlForFileName;
+
+exportObj.list = list;
 
 module.exports = exportObj;
