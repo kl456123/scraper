@@ -7,11 +7,11 @@ var co = require('co');
 var proRequest = require('../../utils/utils.js').proRequest;
 
 
-var getURL = function(urlSrc) {
+var getURL = function(urlSrc, urlSelector) {
 	return new Promise(function(resolve, reject) {
 		request(urlSrc, function(error, response, data) {
 			if (!error && response.statusCode === 200) {
-				var urls = parse(data, urlSrc).slice(0);
+				var urls = parse(data, urlSrc, urlSelector).slice(0);
 				resolve(urls);
 			} else {
 				reject(error);
@@ -37,11 +37,14 @@ var getURL = function(urlSrc) {
 // }
 
 
-function parse(data, url) {
-
+function parse(data, url, urlSelector) {
+	// default scrapy link
+	if (urlSelector === undefined) {
+		urlSelector = 'a';
+	}
 	var urls = [];
 	var $ = cheerio.load(data);
-	var a = $('a').toArray();
+	var a = $(urlSelector).toArray();
 	a.forEach(function(aOne) {
 		var href = aOne.attribs.href;
 		href = handleUrl(href, url);

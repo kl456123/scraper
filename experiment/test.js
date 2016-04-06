@@ -30,3 +30,5 @@ function setName(obj) {
 var person = {};
 setName(person);
 console.log(person.name);
+
+console.log(typeof 'safa');

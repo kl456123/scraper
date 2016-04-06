@@ -91,7 +91,7 @@ function deleteFile(path) {
 function proRequest(requrl) {
 	return new Promise(function(resolve, reject) {
 		request(requrl, function(error, response, data) {
-			if (!error && response.statusCode === 200) {
+			if (!error) {
 				// console.log(body); //返回请求页面的HTML
 
 				// handle data of request. requrl is just for process url later.
@@ -182,6 +182,12 @@ function async(func, callback) {
 	setTimeout(callback, 0);
 }
 
+// get filename from url
+function parseUrlForFileName(address) {
+	var filename = path.basename(address);
+	return filename;
+}
+
 var exportObj = {};
 
 exportObj.handleUrl = handleUrl;
@@ -195,5 +201,7 @@ exportObj.configAll = configAll;
 exportObj.download = download;
 
 exportObj.async = async;
+
+exportObj.parseUrlForFileName = parseUrlForFileName;
 
 module.exports = exportObj;

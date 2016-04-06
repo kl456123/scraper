@@ -1,1 +1,2 @@
 --watch
+--timeout 5000
