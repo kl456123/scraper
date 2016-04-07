@@ -44,7 +44,7 @@ describe('one process scrapy function test', function() {
 var path = '../data/temp/';
 var filename;
 var saveObj = {};
-describe.only('test writeFile function', function() {
+describe('test writeFile function', function() {
   saveObj.name = 'breakpoint';
   saveObj.age = 20;
   filename = 'obj';
@@ -71,3 +71,35 @@ describe.only('test writeFile function', function() {
       });
   });
 });
+
+var getURL = require('../workSpace/Images/getURL.js').getURL;
+var options = require('../data/headers/options.js');
+var asyGetURL = require('../workSpace/Images/getURL.js').asyGetURL;
+
+var options_get = options.options_get1;
+
+options_get.url = 'http://www.kuaidaili.com/';
+
+var urlSelector = 'ul>li>a[id*="p"]';
+describe('test getURL function', function() {
+  it('#test if get correct url', function(done) {
+    getURL(options_get, urlSelector)
+      .then(function(urls) {
+        // console.log(urls);
+        done();
+      })
+      .catch(function(err) {
+        console.log(err.stack);
+        done(err);
+      });
+  });
+});
+
+describe.only('test asyGetURL function', function() {
+  this.timeout(10000);
+  it('#test if get correct url', function(done) {
+    asyGetURL(options_get, urlSelector, function(url) {
+      // console.log(url);
+    });
+  });
+})

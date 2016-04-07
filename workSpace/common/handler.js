@@ -75,6 +75,7 @@ function handler(page, selector, requrl, isText) {
 
       for (var i = 0; i < len; i++) {
         for (var j = 0; j < selector.length; j++) {
+          // deal expect
           if (data[j][i] === undefined) {
             console.log('i: ' + j + ' j: ' + i);
             continue;

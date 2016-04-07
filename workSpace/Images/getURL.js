@@ -60,7 +60,7 @@ function parse(data, url, urlSelector) {
 		if (href === undefined) {
 			return;
 		}
-		console.log(href);
+		// console.log(href);
 		urls.push(href);
 	});
 	return urls;
@@ -85,25 +85,27 @@ var allURL = [];
 
 // // var result = [];
 
-function _asyGetURL(src, callback) {
-	console.log(allURL.length);
+function _asyGetURL(options, urlSelector, callback) {
+	// console.log(allURL.length);
 	if (allURL.length === 0) {
 		console.log('url is empty');
 		return;
 	}
+	var src = options.url;
 	callback(src);
 	allURL.shift();
 	var data = src.toString() + '\n';
-	fs.appendFile('url.json', data, 'utf8', function(error) {
+	fs.appendFile('../../data/url.json', data, 'utf8', function(error) {
 		if (error) {
 			throw error;
 		}
 	});
-	getURL(src)
+	getURL(options, urlSelector)
 		.then(function(nextURL) {
 			allURL = allURL.concat(nextURL);
 			var url = allURL[0];
-			_asyGetURL(url, callback);
+			options.url = url;
+			_asyGetURL(options, urlSelector, callback);
 		})
 		.catch(function(error) {
 			// console.log(error);
@@ -113,10 +115,10 @@ function _asyGetURL(src, callback) {
 
 
 //
-function asyGetURL(src, callback) {
-
+function asyGetURL(options, urlSelector, callback) {
+	var src = options.url;
 	allURL.push(src);
-	_asyGetURL(src, callback);
+	_asyGetURL(options, urlSelector, callback);
 }
 //
 //

@@ -17,7 +17,7 @@ var options_get = options.options_get1;
 //
 // I will deal the problem to improve it.
 // then I can delete the following urls.
-var urlsrc = 'http://www.kuaidaili.com/';
+var urlsrc = 'http://www.kuaidaili.com/proxylist/1/';
 queue.push(urlsrc);
 // urlsrc = 'http://joke.876.tw/';
 // queue.push(urlsrc);
@@ -62,26 +62,26 @@ function multiScrapy(urlSelector, selector, isText) {
 
     var delay = 5000;
 
-    setTimeout(function() {
-      for (var i = 0; i < numCPUs - 1; i++) {
-        worker = cluster.fork();
+    // setTimeout(function() {
+    //   for (var i = 0; i < numCPUs - 1; i++) {
+    //     worker = cluster.fork();
 
-        _url = queue.pop();
+    //     _url = queue.pop();
 
-        worker.send(_url);
+    //     worker.send(_url);
 
-      }
+    //   }
 
-      for (var id = 1; id < numCPUs; id++) {
-        masterReact(id);
-      }
-    }, delay);
+    //   for (var id = 1; id < numCPUs; id++) {
+    //     masterReact(id);
+    //   }
+    // }, delay);
 
 
-    setInterval(function() {
-      console.log('numReqs =', queue.getLength());
-      // console.log(queue.data[10]);
-    }, 1000);
+    // setInterval(function() {
+    //   console.log('numReqs =', queue.getLength());
+    //   // console.log(queue.data[10]);
+    // }, 1000);
 
 
 
@@ -91,11 +91,12 @@ function multiScrapy(urlSelector, selector, isText) {
 
     function masterReact(id) {
       cluster.workers[id].on('message', function(msg) {
-        // if (queue.isEmpty()) {
-        //   console.log('no url for using');
-        //   return;
-        // }
+
         if (msg === 'error') {
+          if (queue.isEmpty()) {
+            console.log('no url for using');
+            return;
+          }
           var _url = queue.pop();
           bloom.add(_url);
           cluster.workers[id].send(_url);
@@ -105,11 +106,23 @@ function multiScrapy(urlSelector, selector, isText) {
         // queue.pushAll(msg);
         // bloom filter url , just push one url that are not in the queue.
         msg.forEach(function(one) {
+          // console.log(bloom.test(one));
           if (!bloom.test(one)) {
+            bloom.add(one);
             queue.push(one);
           }
         });
-        cluster.workers[id].send(queue.pop());
+        // if (queue.isEmpty()) {
+        //   console.log('no url for using');
+        //   return;
+        // }
+        // console.log(queue.isEmpty());
+        var temp = queue.pop();
+        if (temp === undefined) {
+          process.exit();
+          return;
+        }
+        cluster.workers[id].send(temp);
       });
     }
 
@@ -160,4 +173,4 @@ function multiScrapy(urlSelector, selector, isText) {
 
 
 module.exports = multiScrapy;
-multiScrapy();
+// multiScrapy();
