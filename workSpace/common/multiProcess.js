@@ -7,32 +7,35 @@ var getURL = require('../Images/getURL.js').getURL;
 var handleUrl = require('../../utils/utils.js').handleUrl;
 var BloomFilter = require('bloomfilter').BloomFilter;
 var proRequest = require('../../utils/utils.js').proRequest;
+var scrapy = require('./scrapy.js');
 
+var options = require('../../data/headers/options.js');
+var options_get = options.options_get1;
 // init queue
 //
 // because I have eight cpu cores for matching eight urls
 //
 // I will deal the problem to improve it.
 // then I can delete the following urls.
-var urlsrc = 'http://xiaohua.zol.com.cn/';
+var urlsrc = 'http://www.kuaidaili.com/';
 queue.push(urlsrc);
-urlsrc = 'http://joke.876.tw/';
-queue.push(urlsrc);
-urlsrc = 'http://joke.876.tw/show/5/51624.shtml';
-queue.push(urlsrc);
-urlsrc = 'http://joke.876.tw/show/5/51620.shtml';
-queue.push(urlsrc);
-urlsrc = 'http://joke.876.tw/show/3/51616.shtml';
-queue.push(urlsrc);
-urlsrc = 'http://joke.876.tw/show/9/51614.shtml';
-queue.push(urlsrc);
-urlsrc = 'http://joke.876.tw/show/2/51602.shtml';
-queue.push(urlsrc);
-urlsrc = 'http://joke.876.tw/show/1/51350.shtml';
-queue.push(urlsrc);
+// urlsrc = 'http://joke.876.tw/';
+// queue.push(urlsrc);
+// urlsrc = 'http://joke.876.tw/show/5/51624.shtml';
+// queue.push(urlsrc);
+// urlsrc = 'http://joke.876.tw/show/5/51620.shtml';
+// queue.push(urlsrc);
+// urlsrc = 'http://joke.876.tw/show/3/51616.shtml';
+// queue.push(urlsrc);
+// urlsrc = 'http://joke.876.tw/show/9/51614.shtml';
+// queue.push(urlsrc);
+// urlsrc = 'http://joke.876.tw/show/2/51602.shtml';
+// queue.push(urlsrc);
+// urlsrc = 'http://joke.876.tw/show/1/51350.shtml';
+// queue.push(urlsrc);
 
 
-function multiScrapy(handler, urlSelector, selector) {
+function multiScrapy(urlSelector, selector, isText) {
 
   if (cluster.isMaster) {
 
@@ -45,24 +48,35 @@ function multiScrapy(handler, urlSelector, selector) {
       32 * 256,
       16
     );
-    for (var i = 0; i < numCPUs; i++) {
+
+    // first start a process toget url
+    //  from message queue.
+    if (!queue.isEmpty()) {
       var worker = cluster.fork();
 
       var _url = queue.pop();
 
       worker.send(_url);
-      // });
+
     }
-    // setTimeout(function() {
-    //   for (var i = 0; i < numCPUs - 2; i++) {
-    //     worker = cluster.fork();
 
-    //     url = queue.pop();
+    var delay = 5000;
 
-    //     worker.send(url);
-    //     // });
-    //   }
-    // }, 2000);
+    setTimeout(function() {
+      for (var i = 0; i < numCPUs - 1; i++) {
+        worker = cluster.fork();
+
+        _url = queue.pop();
+
+        worker.send(_url);
+
+      }
+
+      for (var id = 1; id < numCPUs; id++) {
+        masterReact(id);
+      }
+    }, delay);
+
 
     setInterval(function() {
       console.log('numReqs =', queue.getLength());
@@ -72,7 +86,15 @@ function multiScrapy(handler, urlSelector, selector) {
 
 
     Object.keys(cluster.workers).forEach(function(id) {
+      masterReact(id);
+    });
+
+    function masterReact(id) {
       cluster.workers[id].on('message', function(msg) {
+        // if (queue.isEmpty()) {
+        //   console.log('no url for using');
+        //   return;
+        // }
         if (msg === 'error') {
           var _url = queue.pop();
           bloom.add(_url);
@@ -89,7 +111,7 @@ function multiScrapy(handler, urlSelector, selector) {
         });
         cluster.workers[id].send(queue.pop());
       });
-    });
+    }
 
   } else {
     process.on('message', function(url) {
@@ -98,24 +120,32 @@ function multiScrapy(handler, urlSelector, selector) {
       if (!url) {
         return;
       }
-      if (handler !== undefined) {
-        proRequest(url)
-          .then(function([page, requrl]) {
-            handler(page, selector, requrl);
-          })
-          .catch(function(err) {
-            console.log(err);
-          });
-        // handler(selector);
-      }
+      options_get.url = url;
+      // if (handler !== undefined) {
 
-      getURL(url, urlSelector)
+      //   proRequest(options_get)
+      //     .then(function(obj) {
+      //       var page = obj[0];
+      //       var requrl = obj[1];
+      //       // console.log(page);
+      //       handler(page, selector, requrl);
+      //     })
+      //     .catch(function(err) {
+      //       console.log(err);
+      //     });
+      //   // handler(selector);
+      // }
+      scrapy(url, selector, isText);
+
+      getURL(options_get, urlSelector)
         .then(function(urls) {
           // console.log(urls);
-          if (urls.length !== 0) {
-            process.send(urls);
-          }
-
+          // if (urls === undefined) {
+          //   process.send('error');
+          //   return;
+          // }
+          // console.log(urls);
+          process.send(urls);
         })
         .catch(function(err) {
           if (err) {
@@ -130,4 +160,4 @@ function multiScrapy(handler, urlSelector, selector) {
 
 
 module.exports = multiScrapy;
-// multiScripy();
+multiScrapy();

@@ -145,6 +145,19 @@ function writeFile(path, data) {
 }
 
 
+function appendFile(pathname, data) {
+	return new Promise(function(resolve, reject) {
+		fs.appendFile(pathname, data + '\n', 'utf8', function(err) {
+			if (err) {
+				reject(err);
+				return;
+			}
+			resolve();
+		});
+	});
+
+}
+
 /**
  * rename file
  * @param  {string} oldPath old path
@@ -199,6 +212,7 @@ exportObj.deleteDocument = deleteDocument;
 exportObj.writeFile = writeFile;
 exportObj.renameFile = renameFile;
 exportObj.deleteFile = deleteFile;
+exportObj.appendFile = appendFile;
 exportObj.readArray = readArray;
 // exportObj.downloadFile=downloadFile;
 

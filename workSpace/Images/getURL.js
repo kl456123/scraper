@@ -7,11 +7,19 @@ var co = require('co');
 var proRequest = require('../../utils/utils.js').proRequest;
 
 
-var getURL = function(urlSrc, urlSelector) {
+var getURL = function(options, urlSelector) {
 	return new Promise(function(resolve, reject) {
-		request(urlSrc, function(error, response, data) {
-			if (!error && response.statusCode === 200) {
-				var urls = parse(data, urlSrc, urlSelector).slice(0);
+
+		request(options, function(error, response, data) {
+			if (!error) {
+				// console.log(data);
+				var temp;
+				if (typeof options === 'object') {
+					temp = options.url;
+				} else {
+					temp = options;
+				}
+				var urls = parse(data, temp, urlSelector).slice(0);
 				resolve(urls);
 			} else {
 				reject(error);
@@ -48,9 +56,11 @@ function parse(data, url, urlSelector) {
 	a.forEach(function(aOne) {
 		var href = aOne.attribs.href;
 		href = handleUrl(href, url);
+
 		if (href === undefined) {
 			return;
 		}
+		console.log(href);
 		urls.push(href);
 	});
 	return urls;

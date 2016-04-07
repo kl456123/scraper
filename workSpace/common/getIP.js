@@ -1,7 +1,7 @@
 var scrapy = require('./scrapy.js');
 
-var url = 'http://www.xicidaili.com/nn/';
-var selector = ['tr >td:nth-child(3)', 'tr >td:nth-child(4)', 'tr >td:nth-child(5) >a'];
+var url = 'http://www.kuaidaili.com/';
+var selector = ['ul>li>a[id*="p"]'];
 
 scrapy(url, selector)
   .then(function(page) {

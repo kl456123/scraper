@@ -3,6 +3,7 @@ var cheerio = require('cheerio');
 
 var exportObj = require('../../utils/utils.js');
 var writeFile = require('../../utils/ioUtils.js').writeFile;
+var appendFile = require('../../utils/ioUtils.js').appendFile;
 // console.log(writeFile);
 var proRequest = exportObj.proRequest;
 var download = exportObj.download;
@@ -28,13 +29,8 @@ function handler(page, selector, requrl, isText) {
   } else {
     selector.forEach(function(one, index) {
       data[index] = $(selector[index]).toArray();
-      // console.log(typeof data[2]);
-      // list(data[2]);
     });
-    // for (var i = 0; i < selector.length; i++) {
 
-    // }
-    // console.log(data[0][0]);
   }
 
   //  to tell data object if it is text or url
@@ -90,7 +86,14 @@ function handler(page, selector, requrl, isText) {
       }
     }
 
-    writeFile(path + saveName, saveObj)
+    // writeFile(path + saveName, saveObj)
+    //   .then(function() {
+    //     console.log(saveName + ' saved success!');
+    //   })
+    //   .catch(function(err) {
+    //     console.log(err);
+    //   });
+    appendFile(path + saveName, saveObj)
       .then(function() {
         console.log(saveName + ' saved success!');
       })

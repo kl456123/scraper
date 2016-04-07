@@ -4,7 +4,7 @@ var exportObj = require('../../utils/utils.js');
 var proRequest = exportObj.proRequest;
 var options = require('../../data/headers/options.js');
 
-var options_get = options.options_get;
+var options_get = options.options_get1;
 
 function scrapy(url, selector, isText) {
   return new Promise(function(resolve, reject) {

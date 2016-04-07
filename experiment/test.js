@@ -31,4 +31,4 @@ var person = {};
 setName(person);
 console.log(person.name);
 
-console.log(typeof 'safa');
+console.log(typeof {});
