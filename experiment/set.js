@@ -1,0 +1,1 @@
+let Queue = require('../workSpace/common/message.js');

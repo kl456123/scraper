@@ -7,7 +7,7 @@ var getURL = require('../Images/getURL.js').getURL;
 var handleUrl = require('../../utils/utils.js').handleUrl;
 var BloomFilter = require('bloomfilter').BloomFilter;
 var proRequest = require('../../utils/utils.js').proRequest;
-var scrapy = require('./scrapy.js');
+var scrapyer = require('./scrapyer.js');
 
 var options = require('../../data/headers/options.js');
 var options_get = options.options_get1;
@@ -34,7 +34,12 @@ queue.push(urlsrc);
 // urlsrc = 'http://joke.876.tw/show/1/51350.shtml';
 // queue.push(urlsrc);
 
-
+/**
+ * multiprocess-scrapyer
+ * @param  {string}  urlSelector which  url  you want to scrapy
+ * @param  {[type]}  selector    In a page what  you want
+ * @param  {Boolean} isText     Is waht you scrapy text?
+ */
 function multiScrapy(urlSelector, selector, isText) {
 
   if (cluster.isMaster) {
@@ -130,7 +135,9 @@ function multiScrapy(urlSelector, selector, isText) {
     process.on('message', function(url) {
 
       console.log(cluster.worker.id + ':' + url);
+      console.log('asfaasg');
       if (!url) {
+        console.log('asfaas');
         return;
       }
       options_get.url = url;
@@ -148,7 +155,7 @@ function multiScrapy(urlSelector, selector, isText) {
       //     });
       //   // handler(selector);
       // }
-      scrapy(url, selector, isText);
+      scrapyer(url, selector, isText);
 
       getURL(options_get, urlSelector)
         .then(function(urls) {

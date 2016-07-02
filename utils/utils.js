@@ -34,17 +34,17 @@ function handleUrl(URL, preURL) {
 		// throw new Error("url is undefined!");
 		return;
 	}
+	// clear space
 	URL = URL.trim();
 	// add http prex
 	if (URL.slice(0, 2) === '//') {
 		var head = 'http:';
 		URL = head.concat(URL);
 	}
-
-	if (URL[0] !== '/') {
-		var temp = '/';
-		URL = temp.concat(URL);
+	if (URL.slice(0, 4) === 'http') {
+		return URL;
 	}
+
 
 	// add static path
 	if (URL[0] === '/') {
@@ -56,6 +56,11 @@ function handleUrl(URL, preURL) {
 	}
 	if (URL.slice(-1) === '/') {
 		URL = URL.slice(0, -1);
+	}
+
+	if (URL[0] !== '/') {
+		var temp = '/';
+		URL = temp.concat(URL);
 	}
 	// remain
 	return URL;
@@ -97,6 +102,9 @@ function proRequest(requrl) {
 
 				// handle data of request. requrl is just for process url later.
 				// resolve(body, requrl);// just contain one arg,so use array as the arg.
+				if (typeof requrl === 'object') {
+					requrl = requrl.url;
+				}
 				resolve([data, requrl]);
 			} else {
 

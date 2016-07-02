@@ -7,8 +7,8 @@ var handleUrl = require('../../utils/utils.js').handleUrl;
 var proRequest = require('../../utils/utils.js').proRequest;
 var handleImg = require('../../utils/utils.js').handleImg;
 var co = require('co');
-var downloadFile = require('../../utils/ioUtils.js').downloadFile;
-var dir = './img/';
+var download = require('../../utils/utils.js').download;
+var dir = '../../data/temp/';
 
 
 function getImg(requrl) {
@@ -61,14 +61,15 @@ function acquireData(data, requrl) {
         }
 
         var path = dir + filename;
-
-        downloadFile(imgsrc, path, function(err, res) {
+        // for testing
+        console.log(imgsrc);
+        download(imgsrc, path, function(err, res) {
             if (err) {
-                console.log(err);
+                console.log(err.stack);
                 return;
             }
 
-            handleImg(path);
+            // handleImg(path);
 
             console.log(filename + ' done');
         });

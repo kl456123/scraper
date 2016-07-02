@@ -2,32 +2,6 @@ var handler = require('./handler.js');
 var exportObj = require('../../utils/utils.js');
 
 var proRequest = exportObj.proRequest;
-// var options = require('../../data/headers/options.js');
-
-// var options_get = options.options_get1;
-
-// function scrapy(url, selector, isText) {
-//   return new Promise(function(resolve, reject) {
-//     options_get.url = url;
-//     proRequest(options_get)
-//       .then(function(obj) {
-//         // console.log(obj);
-//         var page = obj[0];
-//         var requrl = obj[1];
-//         handler(page, selector, requrl, isText);
-//         resolve(page);
-//       })
-//       .catch(function(err) {
-//         reject(err);
-//         // console.log(err);
-//       });
-//   });
-
-// }
-
-
-
-// module.exports = scrapy;
 
 
 
@@ -35,23 +9,40 @@ var proRequest = exportObj.proRequest;
 
 let log4js = require('log4js');
 let writeFile = require('../../utils/ioUtils.js').writeFile;
+// let defaultConfig = require('../../conf/default.js');
+import defaultConfig from '../../conf/default.js';
+let options = require('../../data/headers/options.js');
+let options_get = options.options_get;
+
+let Queue = require('./message.js');
+let queue = new Queue();
+// get all urls from one webpage
+let getURL = require('../Images/getURL.js').getURL;
+
+
 
 class Scrapyer {
   constructor(options) {
     //default configuration
-    this.isText = 1;
-    this.delay = 0;
-    this.isDownloadPage = 0;
-    this.loggerLevel = 'ALL';
-    this.downloadPath = '../../data/';
+    Object.assign(this, defaultConfig);
+    this.queue = queue;
+    // this.isText = 1;
+    // this.delay = 0;
+    // this.isDownloadPage = 0;
+    // this.loggerLevel = 'ALL';
+    // this.downloadPath = '../../data/';
     /*default filename is demo, you can change it*/
-    this.filename = 'demo';
+    // this.filename = 'demo';
     this.selector = [];
     // options used for initial Scrapyer
     if (typeof options === 'object') {
 
       Object.assign(this, options);
       this.options = options;
+      // All url must be into queue!
+      if (options.url) {
+        queue.push(options.url);
+      }
 
     } else if (typeof options === 'string') {
       let name = options;
@@ -59,10 +50,11 @@ class Scrapyer {
       this.name = name;
 
 
-    } else {
-
-      throw new Error('options must be object or string');
     }
+    /*    else {
+
+          throw new Error('options must be object or string');
+        }*/
     this.logger = log4js.getLogger(this.name); //logger
   }
 
@@ -83,24 +75,36 @@ class Scrapyer {
     that.logger.trace('scrapyer start working');
 
     let tmp = that.options || that.url;
+    let nowurl = '';
+    while (!queue.isEmpty()) {
+      nowurl = queue.pop();
 
-    proRequest(tmp)
-      .then(function(retobj) {
-        let page = retobj[0];
-        let requrl = retobj[1];
-        handler(page, that.selector, requrl, that.isText);
+      if (typeof tmp === 'object') {
+        tmp.url = nowurl;
+      } else {
+        tmp = nowurl;
+      }
+      proRequest(tmp)
+        .then(function(retobj) {
+          let page = retobj[0];
+          let requrl = retobj[1];
+          handler(page, that.selector, requrl, that.isText);
 
-        that._downloadPage(that.filename, page);
+          // plugins functions
+          that._enableRecurrent(nowurl, that.urlSelector);
+          that._downloadPage(that.filename, page);
 
-        if (callback) {
-          callback(null, page);
-        }
-      })
-      .catch(function(err) {
-        if (callback) {
-          callback(err, null);
-        }
-      });
+          if (callback) {
+            callback(null, page);
+          }
+        })
+        .catch(function(err) {
+          if (callback) {
+            callback(err, null);
+          }
+        });
+    }
+
 
 
   }
@@ -113,6 +117,7 @@ class Scrapyer {
     if (this.options) {
       this.options.url = url;
     }
+    this.queue.push(url);
     this.logger.info('set url: ' + this.url);
   }
 
@@ -141,6 +146,16 @@ class Scrapyer {
     this.logger.info('set it logger level: ' + this.level);
   }
 
+  initial() {
+    if (this.HEAD) {
+      if (this.options === undefined) {
+        this.options = options_get;
+      } else {
+        Object.assign(this.options, options_get);
+      }
+    }
+  }
+
 
   //download webpage into /data/html/
   _downloadPage(filename, page) {
@@ -159,6 +174,31 @@ class Scrapyer {
 
   saveDownloadObj() {
 
+  }
+
+  _enableRecurrent(url, urlSelector) {
+    if (!this.recurrent) {
+      return;
+    }
+    if (urlSelector === undefined) {
+      this.logger.fatal('urlSelector is undefined');
+      throw new Error('urlSelector is undefined');
+      return;
+    }
+    // let tmp = this.options||this.url;
+    let tmp = url;
+    // get urls from webpage
+    getURL(tmp, urlSelector)
+      .then(function(urls) {
+        if (urls.length === 0) {
+          this.logger.warn('No urls for uesing');
+          return;
+        }
+        this.queue.pushAllFilter(urls);
+      })
+      .catch(function(err) {
+
+      })
   }
 
 

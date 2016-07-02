@@ -40,6 +40,12 @@ describe('test Queue', function() {
       q.isEmpty().should.be.equal(true);
     });
 
+    it('#test pushAll', function() {
+      q.push(5);
+      q.pushAll([1, 2, 3]);
+      q.getLength().should.be.equal(4);
+    });
+
   });
 
 
@@ -66,5 +72,7 @@ describe('test Queue', function() {
     });
 
   });
+
+
 
 });

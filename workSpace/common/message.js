@@ -25,4 +25,13 @@ Queue.prototype.pushAll = function(arrMsg) {
   this.data = this.data.concat(arrMsg);
 };
 
+Queue.prototype.pushAllFilter = function(arrMsg) {
+  arrMsg.forEach(function(one) {
+    if (this.data.indexOf(one) === -1) {
+      this.data.push(one);
+    }
+  });
+
+}
+
 module.exports = Queue;
