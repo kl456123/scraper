@@ -2,8 +2,14 @@
  * I want to maintain a message by using a queue.
  */
 
-function Queue() {
+/*function Queue() {
   this.data = [];
+}*/
+class Queue {
+  constructor() {
+    this.data = [];
+  }
+
 }
 
 Queue.prototype.push = function(msg) {
@@ -26,12 +32,18 @@ Queue.prototype.pushAll = function(arrMsg) {
 };
 
 Queue.prototype.pushAllFilter = function(arrMsg) {
+  let that = this;
   arrMsg.forEach(function(one) {
-    if (this.data.indexOf(one) === -1) {
-      this.data.push(one);
+    // console.log(typeof this);
+    if (that.data.indexOf(one) === -1) {
+      that.data.push(one);
     }
   });
 
+}
+
+Queue.prototype.front = function() {
+  return this.data[0];
 }
 
 module.exports = Queue;

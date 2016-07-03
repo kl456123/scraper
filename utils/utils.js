@@ -57,11 +57,11 @@ function handleUrl(URL, preURL) {
 	if (URL.slice(-1) === '/') {
 		URL = URL.slice(0, -1);
 	}
-
-	if (URL[0] !== '/') {
-		var temp = '/';
-		URL = temp.concat(URL);
-	}
+	// I don't know why
+	/*	if (URL[0] !== '/') {
+			var temp = '/';
+			URL = temp.concat(URL);
+		}*/
 	// remain
 	return URL;
 
@@ -170,14 +170,15 @@ function configAll() {
 function download(url, path) {
 	return new Promise(function(resolve, reject) {
 		request(url)
-			.pipe(fs.createWriteStream(path))
 			.on('error', function(err) {
 				reject(err);
 
 			})
-			.on('close', function() {
-				resolve();
-			});
+			.pipe(fs.createWriteStream(path))
+
+		.on('close', function() {
+			resolve();
+		});
 
 
 	});

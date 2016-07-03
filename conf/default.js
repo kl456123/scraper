@@ -27,7 +27,13 @@ let settings = {
   "recurrent": false,
 
   // if enable recurrent ,urlSelector must be seted.
-  "urlSelector": "a"
+  "urlSelector": "a",
+
+  // saving method
+  "store": "FILE",
+
+  // chraset default utf-8
+  "chraset": "UTF-8"
 }
 
 export default settings;

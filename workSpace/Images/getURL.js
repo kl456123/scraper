@@ -55,11 +55,17 @@ function parse(data, url, urlSelector) {
 	var a = $(urlSelector).toArray();
 	a.forEach(function(aOne) {
 		var href = aOne.attribs.href;
+		let pre = href;
 		href = handleUrl(href, url);
 
-		if (href === undefined) {
+
+		if (href === undefined || href[0] !== 'h') {
 			return;
 		}
+		/*		if (href[0] !== 'h') {
+					console.log('pre: ' + pre + ' url: ' + url);
+					console.log('href: ' + href);
+				}*/
 		// console.log(href);
 		urls.push(href);
 	});

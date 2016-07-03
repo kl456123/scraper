@@ -19,7 +19,7 @@ var path = '../../data/';
 
 let log4js = require('log4js');
 let logger = log4js.getLogger('demo');
-logger.setLevel('ALL');
+logger.setLevel('OFF');
 
 function handler(page, selector, requrl, isText) {
   // console.log(page);
@@ -43,7 +43,7 @@ function handler(page, selector, requrl, isText) {
 
   if (!isText) {
     //if it is url ,download from the url
-
+    // console.log('afsaf');
     if (data.length === 0) {
       logger.warn('select nothing,please change selector');
     }
@@ -54,19 +54,21 @@ function handler(page, selector, requrl, isText) {
         return;
       }
       // console.log(one);
-      let src = one.attribs.src || one.attribs.srch;
+      let src = one.attribs.src || one.attribs.srch || one.attribs.loadsrc;
       // console.log(src);
       // console.log(requrl);
       // get filename
       var filename = parseUrlForFileName(src);
       // console.log(src);
+      let presrc = src;
       src = handleUrl(src, requrl);
       // abort it if undefined
       if (src === undefined) {
         logger.debug('it is undefined, maybe sth wrong with handleUrl function or src');
+        logger.debug(presrc);
         return;
       }
-
+      // console.log(src);
       download(src, path + 'temp/' + filename)
         .then(function() {
           logger.info(filename + ' download success');
