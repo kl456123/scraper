@@ -1,5 +1,5 @@
-// import Animal from './_es6.js';
-let Animal = require('./_es6.js');
+import Animal from './_es6.js';
+// let Animal = require('./_es6.js');
 
 class Dog extends Animal {
   constructor(name) {

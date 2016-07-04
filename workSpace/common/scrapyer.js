@@ -26,14 +26,7 @@ class Scrapyer {
     //default configuration
     Object.assign(this, defaultConfig);
     this.queue = queue;
-    // this.isText = 1;
-    // this.delay = 0;
-    // this.isDownloadPage = 0;
-    // this.loggerLevel = 'ALL';
-    // this.downloadPath = '../../data/';
-    /*default filename is demo, you can change it*/
-    // this.filename = 'demo';
-    // this.selector = [];
+
     // options used for initial Scrapyer
     if (typeof options === 'object') {
 
@@ -46,11 +39,9 @@ class Scrapyer {
 
     } else if (typeof options === 'string') {
       let name = options;
-
       this.name = name;
-
-
     }
+
     /*    else {
 
           throw new Error('options must be object or string');
@@ -80,7 +71,7 @@ class Scrapyer {
     this.masterProcess(that);
 
     // slave process to deal with preurl
-    this.slaveProcess(that, this.urlSelector);
+    this.slaveProcess(that, this.urlSelector, callback);
   }
 
 
@@ -108,8 +99,8 @@ class Scrapyer {
 
   }
 
-  setDownloadPath(path) {
-    this.downloadPath = path;
+  setDownloadPagePath(path) {
+    this.downloadPagePath = path;
 
   }
 
@@ -124,6 +115,8 @@ class Scrapyer {
     this.chraset = chraset;
   }
 
+  /*var http = require('http');
+  http.createServer(function)*/
 
   initial() {
     if (this.HEAD) {
@@ -139,7 +132,7 @@ class Scrapyer {
   //download webpage into /data/html/
   _downloadPage(filename, page) {
       if (this.isDownloadPage) {
-        writeFile(this.downloadPath + 'html/' + filename + '.html', page)
+        writeFile(this.downloadPagePath + 'html/' + filename + '.html', page)
           .then(function() {
 
             this.logger.info('download webpage success');
@@ -160,7 +153,7 @@ class Scrapyer {
     this.logger.info('set url: ' + this.url);
     this.logger.info('set it download page: ' + this.isDownloadPage);
     this.logger.info('set it logger level: ' + this.level);
-    this.logger.info('set it download path: ' + this.downloadPath);
+    this.logger.info('set it downloadPage path: ' + this.downloadPagePath);
     if (typeof this.selector === 'string') {
       this.logger.info('set selector: ' + this.selector);
     } else {
@@ -178,38 +171,34 @@ class Scrapyer {
   }
 
 
-  saveDownloadObj() {
+  // _enableRecurrent(url, urlSelector) {
+  //   /*this.logger.info('The number of urls is ' + this.queue.getLength());*/
+  //   if (!this.recurrent) {
+  //     return;
+  //   }
+  //   if (urlSelector === undefined) {
+  //     this.logger.fatal('urlSelector is undefined');
+  //     throw new Error('urlSelector is undefined');
+  //     return;
+  //   }
+  //   // let tmp = this.options||this.url;
+  //   let tmp = url;
+  //   // get urls from webpage
+  //   getURL(tmp, urlSelector)
+  //     .then(function(urls) {
+  //       if (urls.length === 0) {
+  //         this.logger.warn('No urls for uesing');
+  //         return;
+  //       }
+  //       // console.log(urls.length);
+  //       this.queue.pushAllFilter(urls);
+  //     })
+  //     .catch(function(err) {
+  //       this.fatal(err);
+  //     });
+  // }
 
-  }
-
-  _enableRecurrent(url, urlSelector) {
-    /*this.logger.info('The number of urls is ' + this.queue.getLength());*/
-    if (!this.recurrent) {
-      return;
-    }
-    if (urlSelector === undefined) {
-      this.logger.fatal('urlSelector is undefined');
-      throw new Error('urlSelector is undefined');
-      return;
-    }
-    // let tmp = this.options||this.url;
-    let tmp = url;
-    // get urls from webpage
-    getURL(tmp, urlSelector)
-      .then(function(urls) {
-        if (urls.length === 0) {
-          this.logger.warn('No urls for uesing');
-          return;
-        }
-        // console.log(urls.length);
-        this.queue.pushAllFilter(urls);
-      })
-      .catch(function(err) {
-        this.fatal(err);
-      });
-  }
-
-  slaveProcess(that, urlSelector) {
+  slaveProcess(that, urlSelector, callback) {
 
     // it is better to use 'this' not 'that',but sth wrong with it
     let geturlWorker = cluster.worker;
@@ -221,13 +210,18 @@ class Scrapyer {
           that.logger.warn('url from masterProcess is undefined,please check urls in queue');
           return;
         }
-
+        // console.log('asfsfasf');
+        // when recevice 'empty' message from master process
+        // slave process exit.
+        /*        if (url === 'empty') {
+                  process.exit();
+                }*/
+        // console.log('asfsf');
         // handle url from master
 
 
         let tmp = that.options || that.url;
 
-        // that._enableRecurrent(nowurl, that.urlSelector);
         if (typeof tmp === 'object') {
           tmp.url = url;
         } else {
@@ -237,7 +231,8 @@ class Scrapyer {
           .then(function(retobj) {
             let page = retobj[0];
             let requrl = retobj[1];
-            handler(page, that.selector, requrl, that.isText);
+            // console.log('asfsf');
+            handler(page, that.selector, requrl, that.isText, that.recurrent);
 
             // plugins functions
 
@@ -254,8 +249,6 @@ class Scrapyer {
           });
 
         if (!that.recurrent) {
-          // process.send([]);
-          process.exit();
           return;
         }
         // just url at present
@@ -296,7 +289,8 @@ class Scrapyer {
           // if empty ,process exit
           if (that.queue.isEmpty()) {
             that.logger.info('no url for using');
-            process.exit();
+            // cluster.workers[id].send('empty');
+            // process.exit();
             return;
           }
 

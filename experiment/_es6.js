@@ -9,4 +9,5 @@ class Animal {
 
 /*let animal = new Animal();
 animal.run();*/
-export default Animal;
+// export default Animal;
+module.exports = Animal;

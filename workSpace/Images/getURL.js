@@ -1,13 +1,15 @@
-var request = require('request');
-var cheerio = require('cheerio');
-var path = require('path');
-var fs = require('fs');
-var handleUrl = require('../../utils/utils.js').handleUrl;
-var co = require('co');
-var proRequest = require('../../utils/utils.js').proRequest;
+import request from 'request';
+import cheerio from 'cheerio';
+import path from 'path';
+import fs from 'fs';
+import co from 'co';
+
+let handleUrl = require('../../utils/utils.js').handleUrl;
+
+let proRequest = require('../../utils/utils.js').proRequest;
 
 
-var getURL = function(options, urlSelector) {
+let getURL = function(options, urlSelector) {
 	return new Promise(function(resolve, reject) {
 
 		request(options, function(error, response, data) {
@@ -50,11 +52,11 @@ function parse(data, url, urlSelector) {
 	if (urlSelector === undefined) {
 		urlSelector = 'a';
 	}
-	var urls = [];
-	var $ = cheerio.load(data);
-	var a = $(urlSelector).toArray();
+	let urls = [];
+	let $ = cheerio.load(data);
+	let a = $(urlSelector).toArray();
 	a.forEach(function(aOne) {
-		var href = aOne.attribs.href;
+		let href = aOne.attribs.href;
 		let pre = href;
 		href = handleUrl(href, url);
 
@@ -75,7 +77,7 @@ function parse(data, url, urlSelector) {
 
 
 
-var exoprtObj = {};
+let exoprtObj = {};
 exoprtObj.getURL = getURL;
 exoprtObj.asyGetURL = asyGetURL;
 module.exports = exoprtObj;
@@ -84,7 +86,7 @@ module.exports = exoprtObj;
 
 //
 //
-var allURL = [];
+let allURL = [];
 // test queen
 //
 

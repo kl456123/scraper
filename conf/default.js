@@ -11,7 +11,7 @@ let settings = {
   "filename": "demo",
 
   // download path(to save file)
-  "downloadPath": "/home/breakpoint/Documents/code/project/JS/crawler/scraper/data/",
+  "downloadPagePath": "/home/breakpoint/Documents/code/project/JS/crawler/scraper/data/",
 
   // logger level
   // you can select from ['ALL','TRACE','WARN','DEBUG','FATAL','INFO']
@@ -33,7 +33,13 @@ let settings = {
   "store": "FILE",
 
   // chraset default utf-8
-  "chraset": "UTF-8"
+  "chraset": "UTF-8",
+
+  // disable log in handler
+  "handlerLoggerLevel": 'ALL',
+
+  // scrapyer name
+  "name": "superScrapyer"
 }
 
 export default settings;

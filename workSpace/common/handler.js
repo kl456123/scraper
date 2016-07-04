@@ -16,10 +16,12 @@ var path = '../../data/';
  *the  data of the list can not match each other!
  */
 
-
+import defaultConfig from '../../conf/default.js';
 let log4js = require('log4js');
-let logger = log4js.getLogger('demo');
-logger.setLevel('OFF');
+let logger = log4js.getLogger('handler');
+
+
+logger.setLevel(defaultConfig.handlerLoggerLevel);
 
 function handler(page, selector, requrl, isText) {
   // console.log(page);
@@ -44,13 +46,20 @@ function handler(page, selector, requrl, isText) {
   if (!isText) {
     //if it is url ,download from the url
     // console.log('afsaf');
-    if (data.length === 0) {
+    //
+    let len = data.length;
+    if (len === 0) {
       logger.warn('select nothing,please change selector');
+      // process.exit();
+      return;
     }
+
+
     data.forEach(function(one) {
 
       if (one === undefined) {
         logger.warn('it is undefined,maybe sth wrong with your selector');
+
         return;
       }
       // console.log(one);
@@ -69,13 +78,19 @@ function handler(page, selector, requrl, isText) {
         return;
       }
       // console.log(src);
-      download(src, path + 'temp/' + filename)
+      download(src, path + 'tmp/' + filename)
         .then(function() {
           logger.info(filename + ' download success');
           // console.log('download ' + filename + 'success');
 
+          // when download all file ,exit
+          len--;
+          if (len === 0 && defaultConfig.recurrent === false) {
+            process.exit();
+          }
         })
         .catch(function(err) {
+          len--;
           logger.fatal(src);
           // console.log(err);
         });
@@ -115,18 +130,13 @@ function handler(page, selector, requrl, isText) {
       }
     }
 
-    // writeFile(path + saveName, saveObj)
-    //   .then(function() {
-    //     console.log(saveName + ' saved success!');
-    //   })
-    //   .catch(function(err) {
-    //     console.log(err);
-    //   });
     appendFile(path + saveName, saveObj)
       .then(function() {
 
         // console.log(saveName + ' saved success!');
         logger.info(saveName + ' saved successly');
+        if (defaultConfig.recurrent === false)
+          process.exit();
       })
       .catch(function(err) {
         logger.fatal(err);
@@ -140,3 +150,68 @@ module.exports = handler;
 
 
 // I want to change it to a class.
+//
+//
+//
+let options = {
+  "name": "handler",
+  "loggerLevel": "ALL",
+  "downloadPath": "../../data/",
+  "isText": 1,
+  "page": ,
+  "selector": ,
+  "requrl": ,
+  "":
+};
+class Handler {
+  constructor(options) {
+    Object.assgin(this, options);
+    this.logger = log4js.getLogger(this.name);
+
+  }
+
+
+  inform() {
+    this.logger.info('handler name: ' + this.name);
+    this.logger.info('handler logger level: ' + this.loggerLevel);
+    this.logger.info('handler downloadPath: ' + this.downloadPath);
+    // check isText
+    let isText = '';
+    if (this.isText) {
+      isText = 'Text';
+    } else {
+      isText = 'Non-Text';
+    }
+    this.logger.info('handler for: ' + isText);
+    this.logger.info('handler url: ' + this.requrl);
+
+    // this.logger.info('handler selector: ' + this.selector);
+  }
+
+  // download text
+  textDownload() {
+
+  }
+
+  // download file(images or other binary file)
+  fileDownload() {
+
+  }
+
+  //initial handle web page
+  initHandle() {
+
+  }
+
+  //
+  handleAll() {
+    let data = this.initHandle();
+
+    if (this.isText) {
+      textDownload();
+    } else {
+      fileDownload();
+    }
+  }
+
+}

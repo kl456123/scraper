@@ -4,7 +4,7 @@ var fs = require('fs');
 // load simple config
 // then move all to a file
 var url = 'mongodb://localhost:27017/scraper';
-var collection = 'jokes';
+var collection = 'images';
 
 
 
@@ -132,9 +132,13 @@ function deleteFile(path) {
  * @param  {string} data  data you want to save
  * @return {promise class}
  */
-function writeFile(path, data) {
+function writeFile(path, data, chraset) {
+	// default utf8
+	if (chraset === undefined) {
+		chraset = 'utf8';
+	}
 	return new Promise(function(resolve, reject) {
-		fs.writeFile(path, data, 'utf8', function(err) {
+		fs.writeFile(path, data, chraset, function(err) {
 			if (err) {
 				reject(err);
 			} else {
