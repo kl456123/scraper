@@ -11,11 +11,11 @@ let settings = {
   "filename": "demo",
 
   // download path(to save file)
-  "downloadPagePath": "/home/breakpoint/Documents/code/project/JS/crawler/scraper/data/",
+  "downloadPagePath": "/home/breakpoint/Documents/code/project/JS/crawler/scraper/data/html/",
 
   // logger level
   // you can select from ['ALL','TRACE','WARN','DEBUG','FATAL','INFO']
-  "loggerLevel": "ALL",
+  "loggerLevel": "INFO",
 
   // need  to configue head request by default
   "HEAD": true,

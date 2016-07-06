@@ -1,15 +1,16 @@
-var cheerio = require('cheerio');
+import cheerio from 'cheerio';
 
-var exportObj = require('../../utils/utils.js');
-var writeFile = require('../../utils/ioUtils.js').writeFile;
-var appendFile = require('../../utils/ioUtils.js').appendFile;
+import exportObj from '../../utils/utils.js';
 
-var proRequest = exportObj.proRequest;
-var download = exportObj.download;
-var parseUrlForFileName = exportObj.parseUrlForFileName;
-var handleUrl = exportObj.handleUrl;
+let writeFile = require('../../utils/ioUtils.js').writeFile;
+let appendFile = require('../../utils/ioUtils.js').appendFile;
 
-var path = '../../data/';
+let proRequest = exportObj.proRequest;
+let download = exportObj.download;
+let parseUrlForFileName = exportObj.parseUrlForFileName;
+let handleUrl = exportObj.handleUrl;
+
+// let path = '../../data/';
 
 
 /**
@@ -21,12 +22,12 @@ let log4js = require('log4js');
 let logger = log4js.getLogger('handler');
 
 
-logger.setLevel(defaultConfig.handlerLoggerLevel);
+/*logger.setLevel(defaultConfig.handlerLoggerLevel);
 
 function handler(page, selector, requrl, isText) {
-  // console.log(page);
+
   var $ = cheerio.load(page);
-  // console.log($);
+
   var data = [];
   if (typeof selector === 'string') {
     data = $(selector).toArray();
@@ -144,30 +145,54 @@ function handler(page, selector, requrl, isText) {
       });
   }
 
-}
+}*/
 
-module.exports = handler;
+// module.exports = handler;
 
 
 // I want to change it to a class.
 //
 //
 //
-let options = {
+/*let options = {
   "name": "handler",
   "loggerLevel": "ALL",
-  "downloadPath": "../../data/",
+  "downloadPath": "../../data/text/",
   "isText": 1,
   "page": ,
   "selector": ,
   "requrl": ,
-  "":
-};
+  "filename": "demo"
+};*/
+
+
+import handlerDefaultConfig from '../../conf/handlerDefaultConfig.js';
+
+
 class Handler {
   constructor(options) {
-    Object.assgin(this, options);
-    this.logger = log4js.getLogger(this.name);
 
+
+    //load default configuration
+    Object.assign(this, handlerDefaultConfig);
+    if (typeof options === 'object') {
+      Object.assign(this, options);
+    }
+
+
+    this.logger = log4js.getLogger(this.name);
+    this.logger.setLevel(this.loggerLevel);
+  }
+
+  // set function
+  //
+  //
+  setIsText(isText) {
+    this.isText = isText;
+  }
+
+  setSelector(selector) {
+    this.selector = selector;
   }
 
 
@@ -177,41 +202,174 @@ class Handler {
     this.logger.info('handler downloadPath: ' + this.downloadPath);
     // check isText
     let isText = '';
+
+
     if (this.isText) {
       isText = 'Text';
     } else {
       isText = 'Non-Text';
     }
     this.logger.info('handler for: ' + isText);
-    this.logger.info('handler url: ' + this.requrl);
 
     // this.logger.info('handler selector: ' + this.selector);
   }
 
   // download text
-  textDownload() {
+  textDownload(data) {
+    // put all into a string.
 
+    this.logger.debug('textDownload');
+    let saveObj = '';
+
+    let saveName = this.filename;
+    if (typeof this.selector === 'string') {
+      // if it is a string...
+
+      data.forEach(function(one) {
+
+        if (one.children[0] == undefined) {
+          return;
+        }
+        let _data = one.children[0].data;
+        saveObj += JSON.stringify(_data) + '\n';
+
+      });
+
+    } else {
+
+      let len = data[0].length;
+
+      for (let i = 0; i < len; i++) {
+        for (let j = 0; j < this.selector.length; j++) {
+
+          // deal expect
+          if (data[j][i] === undefined) {
+            logger.warn('i: ' + j + ' j: ' + i + 'data is not exist,abort it ');
+            continue;
+          }
+
+          if (data[j][i].children[0] == undefined) {
+            logger.warn('i: ' + j + ' j: ' + i + 'data is undefined,abort it ');
+            continue;
+          }
+
+          let _data = JSON.stringify(data[j][i].children[0].data);
+          saveObj += _data + '   ';
+        }
+        saveObj += '\n';
+      }
+    }
+
+    appendFile(this.downloadPath + saveName, saveObj)
+      .then(function() {
+
+        logger.info(saveName + ' saved successly');
+        if (defaultConfig.recurrent === false)
+          process.exit();
+
+      })
+      .catch(function(err) {
+        logger.fatal(err);
+      });
   }
 
   // download file(images or other binary file)
-  fileDownload() {
+  // requrl just for find filename of file needing to be downloaded
+  fileDownload(data, requrl) {
 
+    this.logger.debug('fileDownload');
+    let len = data.length;
+
+    if (len === 0) {
+      logger.warn('select nothing,please change selector');
+      return;
+    }
+
+    if (typeof this.selector === 'array' || typeof data[0] === 'array') {
+      logger.warn("selector don't support select file with array method at present.please select file with string input");
+      return;
+    }
+
+
+    data.forEach(function(one) {
+
+      if (one === undefined) {
+        logger.warn('it is undefined,maybe sth wrong with your selector');
+
+        return;
+      }
+
+      // perhaps maybe other format
+      let src = one.attribs.src || one.attribs.srch || one.attribs.loadsrc;
+
+      // get filename
+      var filename = parseUrlForFileName(src);
+
+      let presrc = src;
+
+      src = handleUrl(src, requrl);
+      // abort it if undefined
+
+      if (src === undefined) {
+        logger.debug('it is undefined, maybe sth wrong with handleUrl function or src');
+        logger.debug(presrc);
+        return;
+      }
+
+      download(src, this.downloadPath + filename)
+        .then(function() {
+          this.logger.info(filename + ' download success');
+
+          // when download all file ,exit
+          len--;
+          if (len === 0 && defaultConfig.recurrent === false) {
+            process.exit();
+          }
+        })
+        .catch(function(err) {
+          len--;
+          logger.fatal(src);
+
+        });
+    });
   }
 
   //initial handle web page
-  initHandle() {
+  initHandle(page, selector) {
+    let $ = cheerio.load(page);
 
+    let data = [];
+    if (typeof selector === 'string') {
+      data = $(selector).toArray();
+    } else {
+      selector.forEach(function(one, index) {
+        data[index] = $(selector[index]).toArray();
+      });
+
+    }
+    return data;
   }
 
-  //
-  handleAll() {
-    let data = this.initHandle();
+  //handle all thing here
+  handle(page, requrl) {
+    this.inform();
+    let data = this.initHandle(page, this.selector);
 
-    if (this.isText) {
-      textDownload();
+    if (this.isText === 1) {
+
+      this.textDownload(data);
     } else {
-      fileDownload();
+
+      this.fileDownload(data, requrl);
     }
   }
 
+  /*  start() {
+      this.inform();
+
+    }*/
+
 }
+
+module.exports = Handler;
+// export default Handler;

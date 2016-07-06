@@ -1,6 +1,6 @@
 // var exportObj = require('./getURL.js');
 // var getImg = require('./getImg.js');
-var fs = require('fs');
+/*var fs = require('fs');
 // var asyGetURL = exportObj.asyGetURL;
 
 // var src = "http://bizhi.sogou.com/cate/index/4?f=nav";
@@ -31,4 +31,15 @@ var person = {};
 setName(person);
 console.log(person.name);
 
-console.log(typeof {});
+console.log(typeof {});*/
+
+
+let f = function() {
+  let data = [];
+  data.push(2);
+  return data;
+};
+
+let data = f();
+
+console.log(data);
