@@ -36,7 +36,8 @@ if you want to set up more ,go to [configuration](#configuration).
 - [message queue](#message-queue)
 - [simulate login](#simulate-login)
 - [configuration](#configuration)
-- [download](#download)
+- [handler](#handler)
+- [scrapyer](#scrapyer)
 - [unit test](#unit-test)
 - [utils](#utils)
 - [experiment](#experiment)
@@ -136,6 +137,15 @@ the rest functions are placed here
 Due to not familar with some syntax of es6 and some functions of tools,we did some experiments here.
 
 It can be deleted in the furture.
+
+
+---
+##unit-test
+We always do unit-test at the same time when we develop this project.
+We use mocha test framework to code for test.
+If you want to know more details,please visite https://mochajs.org .
+And if you want to know how we do it in this project , please read files in test directory.
+
 
 ---
 
