@@ -15,13 +15,13 @@ let getURL = function(options, urlSelector) {
 		request(options, function(error, response, data) {
 			if (!error) {
 				// console.log(data);
-				var temp;
+				let temp;
 				if (typeof options === 'object') {
 					temp = options.url;
 				} else {
 					temp = options;
 				}
-				var urls = parse(data, temp, urlSelector).slice(0);
+				let urls = parse(data, temp, urlSelector).slice(0);
 				resolve(urls);
 			} else {
 				reject(error);
@@ -55,6 +55,7 @@ function parse(data, url, urlSelector) {
 	let urls = [];
 	let $ = cheerio.load(data);
 	let a = $(urlSelector).toArray();
+	// console.log(a);
 	a.forEach(function(aOne) {
 		let href = aOne.attribs.href;
 		let pre = href;
@@ -71,6 +72,9 @@ function parse(data, url, urlSelector) {
 		// console.log(href);
 		urls.push(href);
 	});
+	/*	if (urls.length === 0) {
+			console.log('asfsaf');
+		}*/
 	return urls;
 
 }

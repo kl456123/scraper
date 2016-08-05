@@ -48,6 +48,10 @@
          }*/
      this.logger = log4js.getLogger(this.name); //logger
      this.logger.setLevel(this.loggerLevel);
+
+     // handler success from scrapyer
+
+     handler.setRecurrent(this.recurrent);
    }
 
 
@@ -94,6 +98,10 @@
      handler.setIsText(0);
    }
 
+   setUrlSelector(urlSelector) {
+     this.urlSelector = urlSelector;
+   }
+
    setSelector(selector) {
      // check ....
      this.selector = selector;
@@ -104,6 +112,10 @@
    setIsDownloadPage(flag) {
      this.isDownloadPage = flag;
 
+   }
+   setRecurrent(flag) {
+     this.recurrent = flag;
+     handler.setRecurrent(this.recurrent);
    }
 
    setDownloadPagePath(path) {
@@ -159,6 +171,7 @@
      this.logger.info('set isText: ' + this.isText);
      this.logger.info('set url: ' + this.url);
      this.logger.info('set it download page: ' + this.isDownloadPage);
+     this.logger.info('set recurrent: ' + this.recurrent);
      this.logger.info('set it logger level: ' + this.loggerLevel);
      this.logger.info('set it downloadPage path: ' + this.downloadPagePath);
      if (typeof this.selector === 'string') {
@@ -252,9 +265,18 @@
          if (!that.recurrent) {
            return;
          }
+
+         that.logger.debug('recurrent');
          // just url at present
-         getURL(url, urlSelector)
+         that.logger.debug(urlSelector);
+
+         getURL(tmp, urlSelector)
            .then(function(urls) {
+             if (urls.length === 0 || urls === undefined) {
+               that.logger.warn('urls is undefined or empty,please change urlSelector');
+             }
+             that.logger.debug('urls in slave process: ' + urls.length);
+             // console.log(urls[0]);
              process.send(urls);
            })
            .catch(function(err) {

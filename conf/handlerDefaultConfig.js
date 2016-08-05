@@ -3,11 +3,12 @@ let handlerDefaultConfig = {
   "name": "handler",
 
 
-  "loggerLevel": "INFO",
+  "loggerLevel": "ALL",
 
 
   "downloadPath": "../../data/text/",
 
+  "downloadImgPath": "../../data/tmp/",
 
   "filename": "demo",
 

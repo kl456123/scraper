@@ -6,8 +6,11 @@ import Scrapyer from './scrapyer.js';
 
 let scrapyer = new Scrapyer();
 scrapyer.initial();
-// scrapyer.setNotText();
-scrapyer.seturl('http://www.xiaohuayoumo.com/aiqingxiaohua/21895.html');
-scrapyer.setSelector(['h1']);
+scrapyer.setNotText();
+scrapyer.seturl('http://image.baidu.com/');
+scrapyer.setSelector('img');
+scrapyer.setRecurrent(true);
+// scrapyer.setUrlSelector('div.prev>a');
+scrapyer.setLoggerLevel('ALL');
 // scrapyer.setIsDownloadPage(true);
 scrapyer.start();

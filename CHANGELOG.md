@@ -1,22 +1,28 @@
-0.1.0
-Features
+#0.1.0
+##Features
 
 (finished):
-1. Simulated login
-2. File download
-3. analysis File(image)
-4. encode and decode
+- Simulated login
+- File download
+- analysis File(image)
+- deal with chraset
 
 (unfinished)
-1. proxy
-2. Multi-thread and Multi-process
-3. message queue
+- proxy
+- Multi-thread and Multi-process
+- message queue
 
-0.2.0
-Features
+#0.2.0
+##Features
 (add)
-1.Multi-process
-2.message queue
+- Multi-process
+- message queue
 
 (unfinished)
-1.load
+- load
+
+#0.3.0
+##Features
+(add)
+- ES6 format
+
