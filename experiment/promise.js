@@ -127,8 +127,24 @@ let fn = function() {
 }*/
 
 // first execute syncous code and then add async into event loop.
-setTimeout(function() {
+/*setTimeout(function() {
   console.log("big big world");
 }, 0);
 for (let i = 0; i < 10; i++)
-  console.log(i);
+  console.log(i);*/
+
+Promise.reject()
+  .catch(function(err) {
+    throw new Error('asfas');
+  })
+  .catch(function() {
+    setTimeout(function() {
+      throw new Error('asfas');
+    }, 0);
+  })
+  .then(function() {
+    console.log('ersf');
+  })
+  .then(function() {
+    console.log('asfasf');
+  });

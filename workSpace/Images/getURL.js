@@ -3,6 +3,9 @@ import cheerio from 'cheerio';
 import path from 'path';
 import fs from 'fs';
 import co from 'co';
+import {
+	options_get
+} from '../../data/headers/options.js';
 
 let handleUrl = require('../../utils/utils.js').handleUrl;
 
@@ -11,17 +14,14 @@ let proRequest = require('../../utils/utils.js').proRequest;
 
 let getURL = function(options, urlSelector) {
 	return new Promise(function(resolve, reject) {
-
+		if (typeof options === 'string') {
+			options_get.url = options;
+			options = options_get;
+		}
 		request(options, function(error, response, data) {
 			if (!error) {
-				// console.log(data);
-				let temp;
-				if (typeof options === 'object') {
-					temp = options.url;
-				} else {
-					temp = options;
-				}
-				let urls = parse(data, temp, urlSelector).slice(0);
+				let url = options.url;
+				let urls = parse(data, url, urlSelector).slice(0);
 				resolve(urls);
 			} else {
 				reject(error);

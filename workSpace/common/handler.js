@@ -37,7 +37,7 @@ class Handler {
 
     this.logger = log4js.getLogger(this.name);
     this.logger.setLevel(this.loggerLevel);
-
+    this.initInform = true;
   }
 
   // set function
@@ -60,7 +60,7 @@ class Handler {
     this.logger.info('handler name: ' + this.name);
     this.logger.info('handler logger level: ' + this.loggerLevel);
     this.logger.info('handler downloadPath: ' + this.downloadPath);
-    this.logger.info('handler for urls: ' + requrl);
+
     // check isText
     let isText = '';
 
@@ -136,24 +136,24 @@ class Handler {
   }
 
   // download file(images or other binary file)
-  // requrl just for find filename of file needing to be downloaded
-  fileDownload(data, requrl) {
+  // requrl just for finding filename of file needing to be downloaded
+  fileDownload(srcs, requrl) {
     let that = this;
     that.logger.debug('fileDownload');
-    let len = data.length;
+    let len = srcs.length;
     that.logger.debug(len);
     if (len === 0) {
       logger.warn('select nothing,please change selector');
       return;
     }
 
-    if (typeof that.selector === 'array' || typeof data[0] === 'array') {
+    if (typeof that.selector === 'array' || typeof srcs[0] === 'array') {
       that.logger.warn("selector don't support select file with array method at present.please select file with string input");
       return;
     }
 
 
-    data.forEach(function(one) {
+    srcs.forEach(function(one) {
 
       if (one === undefined) {
         that.logger.warn('it is undefined,maybe sth wrong with your selector');
@@ -214,7 +214,11 @@ class Handler {
 
   //handle all thing here
   handle(page, requrl) {
-    this.inform(requrl);
+    if (this.initInform) {
+      this.inform(requrl);
+      this.initInform = false;
+    }
+    this.logger.info('handler for urls: ' + requrl);
     let data = this._initHandle(page, this.selector);
 
     if (this.isText === 1) {

@@ -1,11 +1,8 @@
-var redis = require('redis');
-var client = redis.createClient(); //creates a new client
+let a = {
+  "name": "breakpoint",
+  "age": "20"
+};
 
-client.on('connect', function() {
-  // client.set('framework', 'AngularJS');
-  client.set('framework', 'ReactJS');
-  client.get('framework', function(err, reply) {
-    console.log(reply);
-  });
-  // console.log('connected');
-});
+for (let i in a) {
+  console.log(a[i]);
+}
